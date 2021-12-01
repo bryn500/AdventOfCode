@@ -1,0 +1,7 @@
+# Advent of Code
+Data/
+obj/
+bin/
+.vs/
+*.sln
+BenchmarkDotNet*/
