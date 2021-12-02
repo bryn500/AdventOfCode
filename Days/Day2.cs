@@ -1,21 +1,21 @@
 ﻿namespace AdventOfCode.Days
 {
     /// <summary>
-    /// w/ 20,000 lines
+    /// w/ 10,000 lines
 
     /// string.split
-    ///|                            Method |        Mean |     Error |    StdDev |    Gen 0 |    Gen 1 |    Gen 2 |   Allocated |
-    ///|---------------------------------- | -----------:|----------:|----------:|---------:| --------:| --------:|------------:|
-    ///|                           SetData |  7,508.7 us | 182.67 us | 529.96 us | 445.3125 |   7.8125 |        - | 2,795,870 B |
-    ///|        CalculateChangeInDirection |    903.7 us |  18.05 us |  37.68 us |  82.0313 |  41.0156 |  41.0156 |   460,294 B |
-    ///| CalculateChangeInDirectionWithAim |    271.0 us |   1.21 us |   1.13 us |        - |        - |        - |           - |
+    ///|  Method |       Mean |    Error |   StdDev |    Gen 0 |   Gen 1 |   Allocated |
+    ///|-------- |-----------:|---------:|---------:|---------:|--------:|------------:|
+    ///| SetData | 3,160.1 us | 53.34 us | 61.42 us | 222.6563 | 15.6250 | 1,402,553 B |
+    ///|   Part1 |   405.7 us |  5.77 us |  5.12 us |  36.1328 |  8.7891 |   230,832 B |
+    ///|   Part2 |   132.7 us |  2.05 us |  1.81 us |        - |       - |           - |
                                                                                                                                                                                                                  
     /// span<T>                                                                              
-    ///|                            Method |        Mean |     Error |    StdDev |    Gen 0 |    Gen 1 |    Gen 2 |   Allocated |
-    ///|---------------------------------- | -----------:|----------:|----------:|---------:| --------:| --------:|  ----------:|
-    ///|                           SetData |  4,335.6 us |  69.57 us |  87.98 us | 125.0000 |  15.6250 |        - |   812,127 B |
-    ///|        CalculateChangeInDirection |    831.3 us |   6.27 us |   5.87 us |  82.0313 |  41.0156 |  41.0156 |   460,294 B |
-    ///| CalculateChangeInDirectionWithAim |    260.7 us |   0.34 us |   0.30 us |        - |        - |        - |           - |
+    ///|  Method |       Mean |    Error |   StdDev |    Gen 0 |   Gen 1 |   Allocated |
+    ///|-------- |-----------:|---------:|---------:| --------:|--------:|  ----------:|
+    ///| SetData | 2,267.1 us | 18.51 us | 16.41 us |  62.5000 | 11.7188 |   410,698 B |
+    ///|   Part1 |   391.7 us |  0.68 us |  0.64 us |  36.6211 |  9.2773 |   230,832 B |
+    ///|   Part2 |   127.8 us |  0.24 us |  0.23 us |        - |       - |           - |
     /// </summary>
     [MemoryDiagnoser]
     public class Day2
@@ -36,7 +36,7 @@
         }
 
         [Benchmark]
-        public MovementAmounts CalculateChangeInDirection()
+        public MovementAmounts Part1()
         {
             var inputDirections = Inputs.GroupBy(x => x.Direction);
 
@@ -46,12 +46,6 @@
             {
                 switch (direction.Key)
                 {
-                    case Direction.Left:
-                        amounts.Left = direction.Sum(x => x.Amount);
-                        break;
-                    case Direction.Right:
-                        amounts.Right = direction.Sum(x => x.Amount);
-                        break;
                     case Direction.Up:
                         amounts.Up = direction.Sum(x => x.Amount);
                         break;
@@ -71,7 +65,7 @@
         }
 
         [Benchmark]
-        public MovementAmounts CalculateChangeInDirectionWithAim()
+        public MovementAmounts Part2()
         {
             var amounts = new MovementAmounts();
 
@@ -79,12 +73,6 @@
             {
                 switch (input.Direction)
                 {
-                    case Direction.Left:
-                        amounts.Horizontal += input.Amount;
-                        break;
-                    case Direction.Right:
-                        amounts.Horizontal -= input.Amount;
-                        break;
                     case Direction.Up:
                         amounts.Aim -= input.Amount;
                         break;
@@ -114,14 +102,11 @@
             public int Traversal { get; set; }
             public int ProductOfPart2Movement => Depth * Traversal;
 
-            // Part 1
-            public int Left { get; set; }
-            public int Right { get; set; }
+            // Part 1            
             public int Up { get; set; }
             public int Down { get; set; }
             public int Forward { get; set; }
             public int Backward { get; set; }
-            public int HorizontalTotal => Left - Right;
             public int DepthTotal => Down - Up;
             public int ForwardTotal => Forward - Backward;
             public int ProductOfPart1Movement => DepthTotal * ForwardTotal;
@@ -132,20 +117,20 @@
             public Direction Direction { get; set; }
             public int Amount { get; set; }
 
-            public MovementInput(ReadOnlySpan<char> input)
+            public MovementInput(string input)
             {
-                //var split = input.Split(' ');
+                var split = input.Split(' ');
 
-                var spaceindex = input.IndexOf(' ');
-                var split = input.Slice(0, spaceindex);
-                var split2 = input.Slice(spaceindex + 1, input.Length - split.Length - 1);
+                //var spaceindex = input.IndexOf(' ');
+                //var split = input.Slice(0, spaceindex);
+                //var split2 = input.Slice(spaceindex + 1, input.Length - split.Length - 1);
 
-                if (!Enum.TryParse(split, true, out Direction result))
+                if (!Enum.TryParse(split[0], true, out Direction result))
                     throw new ArgumentException("Could not parse direction", nameof(input));
 
                 Direction = result;
 
-                if (!int.TryParse(split2, out int amount))
+                if (!int.TryParse(split[1], out int amount))
                     throw new ArgumentException("Could not parse amount", nameof(input));
 
                 Amount = amount;
@@ -156,8 +141,6 @@
         {
             Up,
             Down,
-            Left,
-            Right,
             Forward,
             Backward
         }
