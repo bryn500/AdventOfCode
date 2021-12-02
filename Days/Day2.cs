@@ -117,20 +117,20 @@
             public Direction Direction { get; set; }
             public int Amount { get; set; }
 
-            public MovementInput(string input)
+            public MovementInput(ReadOnlySpan<char> input)
             {
-                var split = input.Split(' ');
+                //var split = input.Split(' ');
 
-                //var spaceindex = input.IndexOf(' ');
-                //var split = input.Slice(0, spaceindex);
-                //var split2 = input.Slice(spaceindex + 1, input.Length - split.Length - 1);
+                var spaceindex = input.IndexOf(' ');
+                var split = input.Slice(0, spaceindex);
+                var split2 = input.Slice(spaceindex + 1, input.Length - split.Length - 1);
 
-                if (!Enum.TryParse(split[0], true, out Direction result))
+                if (!Enum.TryParse(split, true, out Direction result))
                     throw new ArgumentException("Could not parse direction", nameof(input));
 
                 Direction = result;
 
-                if (!int.TryParse(split[1], out int amount))
+                if (!int.TryParse(split2, out int amount))
                     throw new ArgumentException("Could not parse amount", nameof(input));
 
                 Amount = amount;
