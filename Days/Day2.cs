@@ -1,18 +1,21 @@
 ﻿namespace AdventOfCode.Days
 {
     /// <summary>
-    /// Initial
-    ///|                            Method |      Mean |     Error |    StdDev |   Gen 0 |  Gen 1 | Allocated |
-    ///|---------------------------------- |----------:| ---------:| ---------:|--------:|-------:|----------:|
-    ///|                           SetData | 613.62 us |  8.825 us |  7.823 us | 28.3203 | 0.9766 | 180,045 B |
-    ///|        CalculateChangeInDirection |  40.93 us |  0.249 us |  0.233 us |  3.4180 | 0.1221 |  21,696 B |
-    ///| CalculateChangeInDirectionWithAim |  12.89 us |  0.046 us |  0.038 us |       - |      - |         - |
-    /// Span<T> slice from string.split
-    ///|                            Method |      Mean |     Error |    StdDev |   Gen 0 |  Gen 1 | Allocated |
-    ///|---------------------------------- |----------:|----------:|----------:|--------:|-------:|----------:|
-    ///|                           SetData | 519.94 us | 10.352 us | 23.366 us | 12.6953 | 5.8594 |  80,858 B |
-    ///|        CalculateChangeInDirection |  42.15 us |  0.407 us |  0.340 us |  3.4180 | 0.1221 |  21,696 B |
-    ///| CalculateChangeInDirectionWithAim |  13.34 us |  0.171 us |  0.160 us |       - |      - |         - |
+    /// w/ 20,000 lines
+
+    /// string.split
+    ///|                            Method |        Mean |     Error |    StdDev |    Gen 0 |    Gen 1 |    Gen 2 |   Allocated |
+    ///|---------------------------------- | -----------:|----------:|----------:|---------:| --------:| --------:|------------:|
+    ///|                           SetData |  7,508.7 us | 182.67 us | 529.96 us | 445.3125 |   7.8125 |        - | 2,795,870 B |
+    ///|        CalculateChangeInDirection |    903.7 us |  18.05 us |  37.68 us |  82.0313 |  41.0156 |  41.0156 |   460,294 B |
+    ///| CalculateChangeInDirectionWithAim |    271.0 us |   1.21 us |   1.13 us |        - |        - |        - |           - |
+                                                                                                                                                                                                                 
+    /// span<T>                                                                              
+    ///|                            Method |        Mean |     Error |    StdDev |    Gen 0 |    Gen 1 |    Gen 2 |   Allocated |
+    ///|---------------------------------- | -----------:|----------:|----------:|---------:| --------:| --------:|  ----------:|
+    ///|                           SetData |  4,335.6 us |  69.57 us |  87.98 us | 125.0000 |  15.6250 |        - |   812,127 B |
+    ///|        CalculateChangeInDirection |    831.3 us |   6.27 us |   5.87 us |  82.0313 |  41.0156 |  41.0156 |   460,294 B |
+    ///| CalculateChangeInDirectionWithAim |    260.7 us |   0.34 us |   0.30 us |        - |        - |        - |           - |
     /// </summary>
     [MemoryDiagnoser]
     public class Day2
@@ -28,7 +31,8 @@
         public void SetData()
         {
             var test = File.ReadLines("Data/Day2/input.txt");
-            Inputs = test.Select(x => new MovementInput(x)).ToList();
+            foreach (var input in test)
+                Inputs.Add(new MovementInput(input));
         }
 
         [Benchmark]
@@ -111,7 +115,7 @@
             public int ProductOfPart2Movement => Depth * Traversal;
 
             // Part 1
-            public int Left {get; set;}
+            public int Left { get; set; }
             public int Right { get; set; }
             public int Up { get; set; }
             public int Down { get; set; }
@@ -131,7 +135,6 @@
             public MovementInput(ReadOnlySpan<char> input)
             {
                 //var split = input.Split(' ');
-                // span<t>slice instead of string.split
 
                 var spaceindex = input.IndexOf(' ');
                 var split = input.Slice(0, spaceindex);

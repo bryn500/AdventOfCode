@@ -20,7 +20,7 @@
         [Benchmark]
         public void SetData()
         {
-            var lines = File.ReadAllLines("Data/Day1/input.txt");
+            var lines = File.ReadLines("Data/Day1/input.txt");
 
             var depths = lines
                 .Where(x => !string.IsNullOrWhiteSpace(x))
