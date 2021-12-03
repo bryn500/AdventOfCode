@@ -6,11 +6,14 @@
 
 ## Build/Run
 
-From root:
-
 - dotnet build
 - dotnet run
 
+## Test
+
+- dotnet test
+- dotnet test --logger "console;verbosity=minimal"
+
 ## Benchmark
 
-dotnet run -c Release
+- dotnet run -c Release

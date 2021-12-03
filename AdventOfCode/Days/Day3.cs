@@ -15,23 +15,25 @@
     [MemoryDiagnoser]
     public class Day3
     {
-        public int BitLength { get; set; }
+        private const string Filename = "Data/Day3/input.txt";
 
-        public Day3(int bitLength = 12)
+        public int BitLength { get; set; }
+        public IEnumerable<string> Data;
+
+        public Day3(int bitLength = 12, string filename = Filename)
         {
             BitLength = bitLength;
+            Data = File.ReadLines(filename);
         }
 
         [Benchmark]
         public int Part1()
         {
-            var test = File.ReadLines("Data/Day3/input.txt");
-
             var counts = new int[BitLength];
 
             //for (int i = 0; i <= BitLength - 1; i++)
             //    counts[i] = GetCountOfBitAtPosition(test, i);
-            foreach (string input in test)
+            foreach (string input in Data)
             {
                 for (int i = 0; i < input.Length; i++)
                 {
@@ -67,9 +69,7 @@
         [Benchmark]
         public int Part2()
         {
-            var test = File.ReadLines("Data/Day3/input.txt");
-
-            IEnumerable<string> oxygenResult = test;
+            IEnumerable<string> oxygenResult = Data;
             for (var i = 0; i <= BitLength - 1; i++)
             {   
                 if (oxygenResult.Count() <= 1)
@@ -78,7 +78,7 @@
                 oxygenResult = FilterListByBitCount(oxygenResult, i);
             }
 
-            IEnumerable<string> co2Result = test;
+            IEnumerable<string> co2Result = Data;
             for (var i = 0; i <= BitLength - 1; i++)
             {
                 if (co2Result.Count() <= 1)

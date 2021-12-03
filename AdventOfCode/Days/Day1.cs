@@ -11,22 +11,25 @@
     [MemoryDiagnoser]
     public class Day1
     {
+        private const string Filename = "Data/Day1/input.txt";
         private const int WindowSize = 3;
 
         public List<ReportData> ReportList { get; set; }
 
         private List<int> Depths;
 
-        public Day1()
+        public Day1(string filename = Filename)
         {
             ReportList = new List<ReportData>();
-            Depths = new List<int>();            
+            Depths = new List<int>();
+            SetData(filename);
         }
 
-        [GlobalSetup]
-        public void SetData()
+        [Benchmark]
+        [Arguments(Filename)]
+        private void SetData(string filename)
         {
-            var lines = File.ReadLines("Data/Day1/input.txt");
+            var lines = File.ReadLines(filename);
 
             foreach (var depth in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
                 ReportList.Add(new ReportData(int.Parse(depth), ReportList, WindowSize));
@@ -38,7 +41,7 @@
         }
 
         [Benchmark]
-        public int GetIncreasesSimple()
+        public int Part1Simple()
         {
             var count = 0;
 
@@ -51,7 +54,7 @@
         }
 
         [Benchmark]
-        public int GetWindowedIncreasesSimple()
+        public int Part2Simple()
         {
             var count = 0;
             var prevSum = 0;
@@ -77,7 +80,7 @@
         }
 
         [Benchmark]
-        public int GetIncreases()
+        public int Part1()
         {
             // Count items with an increase
             return ReportList.Count(x =>
@@ -86,7 +89,7 @@
         }
 
         [Benchmark]
-        public int GetWindowedIncreases()
+        public int Part2()
         {
             // Count items with a windowed increase
             return ReportList.Count(x =>

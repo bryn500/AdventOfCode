@@ -16,7 +16,7 @@
     ///| SetData | 2,267.1 us | 18.51 us | 16.41 us |  62.5000 | 11.7188 |   410,698 B |
     ///|   Part1 |   391.7 us |  0.68 us |  0.64 us |  36.6211 |  9.2773 |   230,832 B |
     ///|   Part2 |   127.8 us |  0.24 us |  0.23 us |        - |       - |           - |
-    
+
     /// Reduced allocations in Part1 by not grouping by direction
     ///|  Method |       Mean |    Error |   StdDev |   Gen 0 |   Gen 1 | Allocated |
     ///|-------- |-----------:|---------:|---------:|--------:|--------:|----------:|
@@ -27,17 +27,20 @@
     [MemoryDiagnoser]
     public class Day2
     {
+        private const string Filename = "Data/Day2/input.txt";
+
         public List<MovementInput> Inputs { get; set; }
-        public Day2()
+        public Day2(string filename = Filename)
         {
             Inputs = new List<MovementInput>();
+            SetData(filename);
         }
 
-        [GlobalSetup]
         [Benchmark]
-        public void SetData()
+        [Arguments(Filename)]
+        public void SetData(string filename)
         {
-            var test = File.ReadLines("Data/Day2/input.txt");
+            var test = File.ReadLines(filename);
             foreach (var input in test)
                 Inputs.Add(new MovementInput(input));
         }
