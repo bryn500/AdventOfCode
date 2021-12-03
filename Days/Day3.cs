@@ -110,11 +110,10 @@
 
         private int GetCountOfBitAtPosition(IEnumerable<string> list, int position)
         {
-            // counts numbers in position
             int result = 0;
             foreach (string input in list)
             {
-                // get count in postion
+                // increment count in postion
                 if (input[position] == '0')
                     result--;
                 else
