@@ -16,6 +16,13 @@
     ///| SetData | 2,267.1 us | 18.51 us | 16.41 us |  62.5000 | 11.7188 |   410,698 B |
     ///|   Part1 |   391.7 us |  0.68 us |  0.64 us |  36.6211 |  9.2773 |   230,832 B |
     ///|   Part2 |   127.8 us |  0.24 us |  0.23 us |        - |       - |           - |
+    
+    /// Reduced allocations in Part1 by not grouping by direction
+    ///|  Method |       Mean |    Error |   StdDev |   Gen 0 |   Gen 1 | Allocated |
+    ///|-------- |-----------:|---------:|---------:|--------:|--------:|----------:|
+    ///| SetData | 2,201.4 us | 27.53 us | 21.49 us | 62.5000 | 11.7188 | 406,953 B |
+    ///|   Part1 |   128.8 us |  0.24 us |  0.18 us |       - |       - |         - |
+    ///|   Part2 |   130.0 us |  0.23 us |  0.20 us |       - |       - |         - |
     /// </summary>
     [MemoryDiagnoser]
     public class Day2
@@ -24,9 +31,9 @@
         public Day2()
         {
             Inputs = new List<MovementInput>();
-            SetData();
         }
 
+        [GlobalSetup]
         [Benchmark]
         public void SetData()
         {
@@ -36,36 +43,34 @@
         }
 
         [Benchmark]
-        public MovementAmounts Part1()
+        public int Part1()
         {
-            var inputDirections = Inputs.GroupBy(x => x.Direction);
-
             var amounts = new MovementAmounts();
 
-            foreach (var direction in inputDirections)
+            foreach (var input in Inputs)
             {
-                switch (direction.Key)
+                switch (input.Direction)
                 {
                     case Direction.Up:
-                        amounts.Up = direction.Sum(x => x.Amount);
+                        amounts.Up += input.Amount;
                         break;
                     case Direction.Down:
-                        amounts.Down = direction.Sum(x => x.Amount);
+                        amounts.Down += input.Amount;
                         break;
                     case Direction.Forward:
-                        amounts.Forward = direction.Sum(x => x.Amount);
+                        amounts.Forward += input.Amount;
                         break;
                     case Direction.Backward:
-                        amounts.Backward = direction.Sum(x => x.Amount);
+                        amounts.Backward += input.Amount;
                         break;
                 }
             }
 
-            return amounts;
+            return amounts.ProductOfPart1Movement;
         }
 
         [Benchmark]
-        public MovementAmounts Part2()
+        public int Part2()
         {
             var amounts = new MovementAmounts();
 
@@ -90,7 +95,7 @@
                 }
             }
 
-            return amounts;
+            return amounts.ProductOfPart2Movement;
         }
 
         public struct MovementAmounts

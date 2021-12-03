@@ -1,5 +1,13 @@
 ﻿namespace AdventOfCode.Days
 {
+    /// <summary>
+    ///|                     Method |       Mean |      Error |    StdDev |   Gen 0 | Allocated |
+    ///|--------------------------- |-----------:|-----------:|----------:|--------:|----------:|
+    ///|         GetIncreasesSimple |   3.707 us |  0.0362 us | 0.0339 us |       - |         - |
+    ///| GetWindowedIncreasesSimple | 198.255 us |  1.7352 us | 1.6231 us | 30.5176 | 191,712 B |
+    ///|               GetIncreases | 188.817 us |  0.6213 us | 0.5812 us |       - |      40 B |
+    ///|       GetWindowedIncreases | 907.066 us | 10.4398 us | 9.2546 us | 50.7813 | 319,560 B |
+    /// </summary>
     [MemoryDiagnoser]
     public class Day1
     {
@@ -12,28 +20,21 @@
         public Day1()
         {
             ReportList = new List<ReportData>();
-            Depths = new List<int>();
-
-            SetData();
+            Depths = new List<int>();            
         }
 
-        [Benchmark]
+        [GlobalSetup]
         public void SetData()
         {
             var lines = File.ReadLines("Data/Day1/input.txt");
 
-            var depths = lines
+            foreach (var depth in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
+                ReportList.Add(new ReportData(int.Parse(depth), ReportList, WindowSize));
+
+            Depths = lines
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => int.Parse(x))
                 .ToList();
-
-            foreach (var depth in depths)
-            {
-                var reportData = new ReportData(depth, ReportList, WindowSize);
-                ReportList.Add(reportData);
-            }
-
-            Depths.AddRange(depths);
         }
 
         [Benchmark]
@@ -54,7 +55,7 @@
         {
             var count = 0;
             var prevSum = 0;
-            
+
             // skip items without large enough window, loop over remaining
             for (var i = WindowSize; i < Depths.Count; i++)
             {
