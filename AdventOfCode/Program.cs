@@ -16,4 +16,8 @@ var day4 = new Day4("Data/Day4/input.txt");
 Console.WriteLine(day4.Part1().Value.Total); //72770
 Console.WriteLine(day4.Part2().Value.Total); //13912
 
-var summary = BenchmarkRunner.Run<Day4>();
+var day5 = new Day5();
+Console.WriteLine(day5.Part1()); //5197
+Console.WriteLine(day5.Part2()); //18605
+
+var summary = BenchmarkRunner.Run<Day5>();
