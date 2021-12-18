@@ -8,15 +8,15 @@ namespace Tests.Days
         {
             var day6 = new Day6();
             var result = day6.Part1();
-            Assert.AreEqual(5934, result);
+            Assert.AreEqual(26, result);
         }
 
-        //[TestMethod]
-        //public void Part2()
-        //{
-        //    var day6 = new Day6();
-        //    var result = day6.Part2();
-        //    Assert.AreEqual(12, result);
-        //}
+        [TestMethod]
+        public void Part2()
+        {
+            var day6 = new Day6();
+            var result = day6.Part2();
+            Assert.AreEqual(26, result);
+        }
     }
 }

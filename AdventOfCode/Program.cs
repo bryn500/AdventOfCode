@@ -22,7 +22,7 @@ Console.WriteLine(day5.Part2()); //18605
 
 
 var day6 = new Day6();
-Console.WriteLine(day6.Part1()); //
-//Console.WriteLine(day6.Part2()); //
+Console.WriteLine(day6.Part1(80)); // 372984
+Console.WriteLine(day6.Part2(256)); //1681503251694
 
 var summary = BenchmarkRunner.Run<Day6>();
