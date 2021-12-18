@@ -48,7 +48,7 @@
         }
 
         [Benchmark]
-        public Result Part1()
+        public Result? Part1()
         {
             foreach (var number in CalledNumbers)
             {
@@ -67,7 +67,7 @@
                 }
             }
 
-            return new Result();
+            return null;
         }
 
         [Benchmark]

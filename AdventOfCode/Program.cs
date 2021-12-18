@@ -13,7 +13,7 @@ Console.WriteLine(day3.Part1()); // 3429254
 Console.WriteLine(day3.Part2()); // 5410338
 
 var day4 = new Day4("Data/Day4/input.txt");
-Console.WriteLine(day4.Part1().Total); //72770
+Console.WriteLine(day4.Part1().Value.Total); //72770
 Console.WriteLine(day4.Part2().Value.Total); //13912
 
 var summary = BenchmarkRunner.Run<Day4>();
