@@ -20,4 +20,9 @@ var day5 = new Day5();
 Console.WriteLine(day5.Part1()); //5197
 Console.WriteLine(day5.Part2()); //18605
 
-var summary = BenchmarkRunner.Run<Day5>();
+
+var day6 = new Day6();
+Console.WriteLine(day6.Part1()); //
+//Console.WriteLine(day6.Part2()); //
+
+var summary = BenchmarkRunner.Run<Day6>();
