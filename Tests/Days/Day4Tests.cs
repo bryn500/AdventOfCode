@@ -16,12 +16,13 @@ namespace Tests.Days
         [TestMethod]
         public void Part1_Gets_Column()
         {
-            var array = new int[] {13, 17,  1,  0,
+            var array = new int[] {
+                 13, 17,  1,  0,
                   2, 23,  4, 24,
                  21, 14, 16, 22,
                  10,  3, 18,  6,
                  12, 20, 15, 19
-            };            
+            };
 
             var day = new Day4("Data/Day4/input-column.txt");
             var result = day.Part1();
@@ -35,9 +36,9 @@ namespace Tests.Days
         {
             var day = new Day4();
             var result = day.Part2();
-            Assert.AreEqual(13, result.LastCalledNumber);
-            Assert.AreEqual(148, result.SumOfUnmarked);
-            Assert.AreEqual(1924, result.Total);
+            Assert.AreEqual(13, result.Value.LastCalledNumber);
+            Assert.AreEqual(148, result.Value.SumOfUnmarked);
+            Assert.AreEqual(1924, result.Value.Total);
         }
     }
 }
