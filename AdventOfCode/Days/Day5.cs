@@ -1,10 +1,17 @@
 ﻿namespace AdventOfCode.Days
 {
     /// <summary>
+    /// Storing grid for each chart
     ///| Method |         Mean |      Error |     StdDev |      Gen 0 |      Gen 1 |      Gen 2 | Allocated |
     ///|------- |-------------:|-----------:|-----------:|-----------:|-----------:|-----------:|----------:|
     ///|  Part1 |     5.768 ms |  0.0638 ms |  0.0597 ms |   992.1875 |   992.1875 |   992.1875 |      4 MB |
     ///|  Part2 | 1,306.613 ms | 26.0929 ms | 60.4742 ms | 86000.0000 | 86000.0000 | 86000.0000 |    795 MB |
+    /// 
+    /// Don't store each grid, calculate result only
+    ///| Method |     Mean     |     Error  |    StdDev  |    Gen 0   |    Gen 1   |    Gen 2   | Allocated |
+    ///|------- |---------:    |----------: |----------: |---------:  |---------:  |---------:  |----------:|
+    ///|  Part1 |     5.779 ms | 0.0705 ms  | 0.0659 ms  | 992.1875   | 992.1875   | 992.1875   |      4 MB |
+    ///|  Part2 |     6.010 ms | 0.1162 ms  | 0.1291 ms  | 992.1875   | 992.1875   | 992.1875   |      4 MB |
     /// </summary>
     [MemoryDiagnoser]
     public class Day5
@@ -85,21 +92,41 @@
             var chart = new int[maxX + 1, maxY + 1];
 
             foreach (var chartData in data)
-                chart = AddMatrix(chart, chartData.GetHits());
+            {
+                var done = false;
+                var x = chartData.StartX;
+                int y = chartData.StartY;
+                while (!done)
+                {
+                    chart[x, y]++;
+                    if (chartData.StartY < chartData.EndY)
+                    {
+                        y++;
+                        if (y > chartData.EndY)
+                            done = true;
+                    }
+                    else if (chartData.StartY > chartData.EndY)
+                    {
+                        y--;
+                        if (y < chartData.EndY)
+                            done = true;
+                    }
+                    if (chartData.StartX < chartData.EndX)
+                    {
+                        x++;
+                        if (x > chartData.EndX)
+                            done = true;
+                    }
+                    else if (chartData.StartX > chartData.EndX)
+                    {
+                        x--;
+                        if (x < chartData.EndX)
+                            done = true;
+                    }
+                }
+            }                
 
             return chart;
-        }
-
-        private int[,] AddMatrix(int[,] a, int[,] b)
-        {
-            int bBoundsX = b.GetUpperBound(0);
-            int bBoundsY = b.GetUpperBound(1);
-
-            for (var i = 0; i <= bBoundsX; i++)
-                for (var j = 0; j <= bBoundsY; j++)
-                    a[i, j] = a[i, j] + b[i, j];
-
-            return a;
         }
 
         private int GetCountOfDangerPoints(int[,] chart, int dangerValue)
@@ -131,48 +158,8 @@
             public IEnumerable<int> HorizontalLine => Enumerable.Range(MinX, MaxX - MinX + 1);
             public IEnumerable<int> VerticalLine => Enumerable.Range(MinY, MaxY - MinY + 1);
 
-            public int[,] GetHits()
-            {
-                var hits = new int[MaxX + 1, MaxY + 1];
-
-                var done = false;
-                var x = StartX;
-                int y = StartY;
-                while (!done)
-                {
-                    hits[x, y]++;
-                    if (StartY < EndY)
-                    {
-                        y++;
-                        if (y > EndY)
-                            done = true;
-                    }
-                    else if (StartY > EndY)
-                    {
-                        y--;
-                        if (y < EndY)
-                            done = true;
-                    }
-                    if (StartX < EndX)
-                    {
-                        x++;
-                        if (x > EndX)
-                            done = true;
-                    }
-                    else if (StartX > EndX)
-                    {
-                        x--;
-                        if (x < EndX)
-                            done = true;
-                    }
-                }
-
-                return hits;
-            }
-
             public bool IsHorizontalLine => StartY == EndY;
             public bool IsVerticalLine => StartX == EndX;
-            public bool IsDiagonalLine => IsHorizontalLine && IsVerticalLine;
 
             public ChartData(int x0, int x1, int y0, int y1)
             {
