@@ -5,6 +5,12 @@
     /// |------- |---------:|----------:|----------:|---------:|---------:|----------:|
     /// |  Part1 | 1.522 ms | 0.0299 ms | 0.0378 ms | 333.9844 |  66.4063 |      2 MB |
     /// |  Part2 | 2.845 ms | 0.0531 ms | 0.0827 ms | 566.4063 | 238.2813 |      3 MB |
+    /// Removed allocations from List creation in GetLowPoints and using bool isLower
+    /// |    Method |       Mean |    Error |   StdDev |    Gen 0 |    Gen 1 | Allocated |
+    /// |---------- |-----------:|---------:|---------:|---------:|---------:|----------:|
+    /// | ParseFile |   379.3 us |  3.49 us |  2.91 us |  12.2070 |   5.8594 |     77 KB |
+    /// |     Part1 |   521.3 us |  2.81 us |  2.63 us |  15.6250 |   7.8125 |     96 KB |
+    /// |     Part2 | 1,730.8 us | 21.97 us | 20.55 us | 248.0469 | 117.1875 |  1,529 KB |
     /// </summary>
     [MemoryDiagnoser]
     public class Day9
@@ -13,29 +19,24 @@
 
         public IEnumerable<string> Data;
 
-        int recursiveCount = 0;
-
         public Day9(string filename = Filename)
         {
             Data = File.ReadLines(filename);
         }
 
-        public int[][] ParseFile()
+        [Benchmark]
+        public List<int[]> ParseFile()
         {
-            var allLines = Data.ToList();
+            var map = new List<int[]>();
 
-            int[][] map = new int[allLines.Count][];
-
-            for (var i = 0; i < allLines.Count; i++)
+            foreach (var line in Data)
             {
-                map[i] = new int[allLines[i].Length];
+                var arr = new int[line.Length];
 
-                for (var c = 0; c < allLines[i].Length; c++)
-                {
-                    var val = allLines[i][c];
-                    var num = char.GetNumericValue(val);
-                    map[i][c] = (int)num;
-                }
+                for (var c = 0; c < line.Length; c++)
+                    arr[c] = (int)char.GetNumericValue(line[c]);
+
+                map.Add(arr);
             }
 
             return map;
@@ -70,27 +71,27 @@
             return result;
         }
 
-        private HashSet<D9Point> GetLowPoints(int[][] map)
+        private HashSet<D9Point> GetLowPoints(List<int[]> map)
         {
             var lowPoints = new HashSet<D9Point>();
 
-            for (var i = 0; i < map.Length; i++)
+            for (var i = 0; i < map.Count; i++)
             {
                 for (var c = 0; c < map[i].Length; c++)
                 {
                     var currentVal = map[i][c];
-                    var pointsToCheck = new List<int>();
+                    bool isLower = true;
 
                     if (i != 0)
-                        pointsToCheck.Add(map[i - 1][c]);
-                    if (i != map.Length - 1)
-                        pointsToCheck.Add(map[i + 1][c]);
+                        isLower = isLower && map[i - 1][c] > currentVal;
+                    if (i != map.Count - 1)
+                        isLower = isLower && map[i + 1][c] > currentVal;
                     if (c != 0)
-                        pointsToCheck.Add(map[i][c - 1]);
+                        isLower = isLower && map[i][c - 1] > currentVal;
                     if (c != map[i].Length - 1)
-                        pointsToCheck.Add(map[i][c + 1]);
+                        isLower = isLower && map[i][c + 1] > currentVal;
 
-                    if (pointsToCheck.All(x => x > currentVal))
+                    if (isLower)
                         lowPoints.Add(new D9Point(i, c, currentVal));
                 }
             }
@@ -98,27 +99,29 @@
             return lowPoints;
         }
 
-        private HashSet<D9Point> GetBasin(int[][] map, HashSet<D9Point> basin, D9Point lowpoint)
+        private HashSet<D9Point> GetBasin(List<int[]> map, HashSet<D9Point> basin, D9Point pt)
         {
-            recursiveCount++;
-
-            if (lowpoint.Depth == 9)
+            if (pt.Depth == 9)
                 return basin;
 
-            if (!basin.Add(lowpoint))
+            if (!basin.Add(pt))
                 return basin;
 
-            if (lowpoint.Row != 0)
-                basin = GetBasin(map, basin, new D9Point(lowpoint.Row - 1, lowpoint.Col, map[lowpoint.Row - 1][lowpoint.Col]));
-            if (lowpoint.Row != map.Length - 1)
-                basin = GetBasin(map, basin, new D9Point(lowpoint.Row + 1, lowpoint.Col, map[lowpoint.Row + 1][lowpoint.Col]));
-            if (lowpoint.Col != 0)
-                basin = GetBasin(map, basin, new D9Point(lowpoint.Row, lowpoint.Col - 1, map[lowpoint.Row][lowpoint.Col - 1]));
-            if (lowpoint.Col != map[lowpoint.Row].Length - 1)
-                basin = GetBasin(map, basin, new D9Point(lowpoint.Row, lowpoint.Col + 1, map[lowpoint.Row][lowpoint.Col + 1]));
+            if (pt.Row != 0)
+                basin = GetBasin(map, basin,
+                    new D9Point(pt.Row - 1, pt.Col, map[pt.Row - 1][pt.Col]));
+            if (pt.Row != map.Count - 1)
+                basin = GetBasin(map, basin,
+                    new D9Point(pt.Row + 1, pt.Col, map[pt.Row + 1][pt.Col]));
+            if (pt.Col != 0)
+                basin = GetBasin(map, basin,
+                    new D9Point(pt.Row, pt.Col - 1, map[pt.Row][pt.Col - 1]));
+            if (pt.Col != map[pt.Row].Length - 1)
+                basin = GetBasin(map, basin,
+                    new D9Point(pt.Row, pt.Col + 1, map[pt.Row][pt.Col + 1]));
 
             return basin;
-        }        
+        }
     }
     public struct D9Point : IEquatable<D9Point>
     {
@@ -157,6 +160,16 @@
                 hash = hash * 31 + Col.GetHashCode();
                 return hash;
             }
+        }
+
+        public static bool operator ==(D9Point left, D9Point right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(D9Point left, D9Point right)
+        {
+            return !(left == right);
         }
     }
 }
