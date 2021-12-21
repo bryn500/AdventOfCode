@@ -5,6 +5,9 @@
     /// |------- |------------:|---------:|---------:|----------:|--------:|----------:|
     /// |  Part1 |    641.2 us | 12.57 us | 14.48 us |   38.0859 |  1.9531 |    238 KB |
     /// |  Part2 | 10,042.3 us | 77.54 us | 72.54 us | 1375.0000 | 46.8750 |  8,488 KB |
+    /// Order chars when added to map and invert map
+    /// |  Part1 |   621.5 us  |  7.06 us |  6.60 us |  38.0859 |   1.9531 |    238 KB |
+    /// |  Part2 | 3,888.9 us  | 34.83 us | 30.88 us | 500.0000 | 125.0000 |  3,093 KB |
     /// </summary>
     [MemoryDiagnoser]
     public class Day8
@@ -64,46 +67,56 @@
             int count = 0;
             foreach (var line in data)
             {
-                var patterns = line.Item1;
-                var outputs = line.Item2;
-
                 var maps = new Dictionary<int, string>();
+                var mapInverted = new Dictionary<string, int>();
 
                 // add map from length to number value
-                // potentially skip this
-                foreach (var code in patterns)
+                foreach (var code in line.Item1)
+                {
                     if (_mappings.ContainsKey(code.Length) && !maps.ContainsValue(code))
-                        maps.Add(_mappings[code.Length], code);
+                    {
+                        maps.Add(_mappings[code.Length], OrderStringByChar(code));
+                        mapInverted.Add(OrderStringByChar(code), _mappings[code.Length]);
+                    }
+                }
 
                 // figure out inputs of length 6
-                foreach (var val in patterns.Where(x => x.Length == 6))
+                foreach (var val in line.Item1.Where(x => x.Length == 6))
                     if (maps[1].Except(val).Count() == 1)
-                        maps[6] = val;
+                        mapInverted.Add(OrderStringByChar(val), 6);
                     else if (!maps[4].Except(val).Any())
-                        maps[9] = val;
+                        mapInverted.Add(OrderStringByChar(val), 9);
                     else
-                        maps[0] = val;
+                        mapInverted.Add(OrderStringByChar(val), 0);
 
                 // figure out inputs of length 5
-                foreach (var val in patterns.Where(x => x.Length == 5))
+                foreach (var val in line.Item1.Where(x => x.Length == 5))
                     if (!maps[1].Except(val).Any())
-                        maps[3] = val;
+                        mapInverted.Add(OrderStringByChar(val), 3);
                     else if (maps[4].Except(val).Count() == 2)
-                        maps[2] = val;
+                        mapInverted.Add(OrderStringByChar(val), 2);
                     else
-                        maps[5] = val;
+                        mapInverted.Add(OrderStringByChar(val), 5);
 
-                var no = "";
+                var num = "";
 
-                foreach (var output in outputs)
-                    foreach (var n in maps)
-                        if (string.Concat(n.Value.OrderBy(c => c)) == string.Concat(output.OrderBy(c => c)))
-                            no += n.Key.ToString();
+                foreach (var output in line.Item2)
+                {
+                    var ordered = OrderStringByChar(output);
 
-                count += int.Parse(no);
+                    if (mapInverted.ContainsKey(ordered))
+                        num += mapInverted[ordered].ToString();
+                }
+
+                count += int.Parse(num);
             }
 
             return count;
+        }
+
+        private static string OrderStringByChar(string val)
+        {
+            return string.Concat(val.OrderBy(c => c));
         }
     }
 }
