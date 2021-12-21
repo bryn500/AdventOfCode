@@ -14,33 +14,62 @@
             Data = File.ReadLines(filename);
         }
 
-        public List<Tuple<string[], string[]>> ParseFile()
+        public int[][] ParseFile()
         {
-            var result = new List<Tuple<string[], string[]>>();
+            var allLines = Data.ToList();
 
-            foreach (var line in Data)
+            int[][] map = new int[allLines.Count][];
+
+            for (var i = 0; i < allLines.Count; i++)
             {
-                var split = line.Split(" | ");
-                var inputs = split[0].Trim().Split(' ');
-                var outputs = split[1].Trim().Split(' ');
-                result.Add(new Tuple<string[], string[]>(inputs, outputs));
-            }
+                map[i] = new int[allLines[i].Length];
 
-            return result;
+                for (var c = 0; c < allLines[i].Length; c++)
+                {
+                    var val = allLines[i][c];
+                    var num = char.GetNumericValue(val);
+                    map[i][c] = (int)num;
+                }
+            }
+                
+
+            return map;
         }
 
         [Benchmark]
         public int Part1()
         {
             var data = ParseFile();
-            
-            return 0;
+            var lowPoints = new List<int>();
+
+            for (var i = 0; i < data.Length; i++)
+            {
+                for (var c = 0; c < data[i].Length; c++)
+                {
+                    var currentVal = data[i][c];
+                    var pointsToCheck = new List<int>();
+
+                    if (i != 0)
+                        pointsToCheck.Add(data[i - 1][c]);
+                    if (i != data.Length - 1)
+                        pointsToCheck.Add(data[i + 1][c]);
+                    if (c != 0)
+                        pointsToCheck.Add(data[i][c - 1]);
+                    if (c != data[i].Length - 1)
+                        pointsToCheck.Add(data[i][c + 1]);
+
+                    if(pointsToCheck.All(x => x > currentVal))
+                        lowPoints.Add(currentVal);
+                }
+            }
+
+            return lowPoints.Sum(x => 1 + x);
         }
 
         [Benchmark]
         public long Part2()
         {
-            var data = ParseFile();            
+            var data = ParseFile();
 
             return 0;
         }
