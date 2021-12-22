@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Tests.Days
 {
     [TestClass]
@@ -16,7 +18,7 @@ namespace Tests.Days
         {
             var day10 = new Day10();
             var result = day10.Part2();
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(288957, result);
         }
     }
 }

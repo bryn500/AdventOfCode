@@ -36,4 +36,8 @@ var day9 = new Day9();
 Console.WriteLine(day9.Part1()); // 502
 Console.WriteLine(day9.Part2()); // 1330560
 
-var summary = BenchmarkRunner.Run<Day9>();
+var day10 = new Day10();
+Console.WriteLine(day10.Part1()); // 339411
+Console.WriteLine(day10.Part2()); // 264368900
+
+var summary = BenchmarkRunner.Run<Day10>();
